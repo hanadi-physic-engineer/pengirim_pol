@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multi Token Sender</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #ffffff;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg fade-in">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Multi Token Sender</h1>
+    
+    <div class="space-y-4">
+      <!-- Network Select -->
+      <div>
+        <label for="networkSelect" class="block text-sm font-medium text-gray-700">Network</label>
+        <select id="networkSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md">
+          <option value="137" selected>Polygon Mainnet</option>
+          <option value="56">BSC Mainnet</option>
+        </select>
+      </div>
+
+      <!-- Token Select -->
+      <div>
+        <label for="tokenSelect" class="block text-sm font-medium text-gray-700">Token</label>
+        <select id="tokenSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md">
+          <option value="native">Native (POL/BNB)</option>
+          <option value="0xc2132D05D31c914a87C6611C10748AEb04B58e8F" data-network="137">USDT (Polygon)</option>
+          <option value="0x55d398326f99059fF775485246999027B3197955" data-network="56">USDT (BSC)</option>
+          <option value="0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56" data-network="56">BUSD (BSC)</option>
+          <option value="custom">Custom Token</option>
+        </select>
+      </div>
+
+      <!-- Custom Token Address -->
+      <div id="customTokenDiv" class="hidden">
+        <label for="tokenAddress" class="block text-sm font-medium text-gray-700">Custom Token Address</label>
+        <input type="text" id="tokenAddress" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md" placeholder="0x...">
+      </div>
+
+      <!-- Amount Input -->
+      <div>
+        <label for="amountInput" class="block text-sm font-medium text-gray-700">Amount per Address</label>
+        <input type="number" id="amountInput" step="0.000001" min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md" placeholder="e.g., 0.01">
+      </div>
+
+      <!-- Address Input -->
+      <div>
+        <label for="csvInput" class="block text-sm font-medium text-gray-700">Upload CSV (Addresses)</label>
+        <input type="file" id="csvInput" accept=".csv" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all duration-300">
+      </div>
+      <div>
+        <label for="addresses" class="block text-sm font-medium text-gray-700">Or Enter Addresses (one per line)</label>
+        <textarea id="addresses" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md" placeholder="0x123...456\n0x789...abc"></textarea>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex space-x-4">
+        <button id="connectWallet" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105">Connect Wallet</button>
+        <button id="sendTokens" disabled class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed">Send Tokens</button>
+      </div>
+
+      <!-- Status -->
+      <div id="status" class="mt-4 text-center"></div>
+    </div>
+  </div>
+
+  <script>
+    const networkConfigs = {
+      '137': { name: 'Polygon Mainnet', rpc: 'https://polygon-rpc.com/', chainId: 137, native: 'POL' },
+      '56': { name: 'BSC Mainnet', rpc: 'https://bsc-dataseed.binance.org/', chainId: 56, native: 'BNB' }
+    };
+
+    const multiSendABI = [
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "address", "name": "sender", "type": "address" },
+          { "indexed": false, "internalType": "uint256", "name": "time", "type": "uint256" }
+        ],
+        "name": "CooldownViolation",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          { "internalType": "address", "name": "token", "type": "address" },
+          { "internalType": "address[]", "name": "recipients", "type": "address[]" },
+          { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+        ],
+        "name": "multiSend",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
+          { "indexed": true, "internalType": "address", "name": "recipient", "type": "address" },
+          { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "TokenTransferFailed",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
+          { "indexed": true, "internalType": "address", "name": "sender", "type": "address" },
+          { "indexed": false, "internalType": "address[]", "name": "recipients", "type": "address[]" },
+          { "indexed": false, "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+        ],
+        "name": "TokensSent",
+        "type": "event"
+      },
+      {
+        "inputs": [{ "internalType": "address", "name": "sender", "type": "address" }],
+        "name": "getRemainingCooldown",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "MAX_RECIPIENTS",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "TRANSACTION_COOLDOWN",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    const multiSendPOLABI = [
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "address", "name": "recipient", "type": "address" },
+          { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "Failed",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          { "internalType": "address[]", "name": "recipients", "type": "address[]" },
+          { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
+        ],
+        "name": "multiSend",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "address", "name": "recipient", "type": "address" },
+          { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "Sent",
+        "type": "event"
+      },
+      { "stateMutability": "payable", "type": "receive" }
+    ];
+
+    const tokenABI = [
+      {
+        "inputs": [
+          { "internalType": "address", "name": "spender", "type": "address" },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "name": "approve",
+        "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+        "name": "balanceOf",
+        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "decimals",
+        "outputs": [{ "internalType": "uint8", "name": "", "type": "uint8" }],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ];
+
+    let web3, account, multiSendContract, multiSendPOLContract;
+
+    // Update alamat kontrak setelah deploy di Remix
+    const multiSendContractAddress = "0xcB4E93Fe6C2568729247603494eE2b3593301403"; // GANTI DENGAN ALAMAT MultiSend.sol
+    const multiSendPOLContractAddress = "0x0B22044010b34928A55B93c4B9bC343c055C046B"; // GANTI DENGAN ALAMAT MultiSendPOL.sol
+
+    async function estimateGasPrice() {
+      try {
+        const feeData = await web3.eth.getFeeData();
+        const baseFee = feeData.lastBaseFeePerGas || web3.utils.toWei('200', 'gwei');
+        const maxPriorityFee = web3.utils.toWei('30', 'gwei'); // Minimal 25 gwei
+        const maxFeePerGas = parseInt(baseFee) + parseInt(maxPriorityFee);
+        return {
+          maxPriorityFeePerGas: maxPriorityFee,
+          maxFeePerGas: maxFeePerGas > web3.utils.toWei('100', 'gwei') ? maxFeePerGas : web3.utils.toWei('100', 'gwei')
+        };
+      } catch (error) {
+        console.error('Gas estimation error:', error);
+        return {
+          maxPriorityFeePerGas: web3.utils.toWei('30', 'gwei'),
+          maxFeePerGas: web3.utils.toWei('100', 'gwei')
+        };
+      }
+    }
+
+    async function initWeb3() {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await web3.eth.getAccounts();
+          account = accounts[0];
+          showStatus(`Connected: ${account.slice(0, 6)}...${account.slice(-4)}`, 'text-green-600');
+          document.getElementById('sendTokens').disabled = false;
+
+          // Validasi alamat kontrak
+          if (!web3.utils.isAddress(multiSendContractAddress) || !web3.utils.isAddress(multiSendPOLContractAddress)) {
+            showStatus('Invalid contract address! Please check MultiSend.sol or MultiSendPOL.sol address.', 'text-red-600');
+            document.getElementById('sendTokens').disabled = true;
+            return;
+          }
+
+          multiSendContract = new web3.eth.Contract(multiSendABI, multiSendContractAddress);
+          multiSendPOLContract = new web3.eth.Contract(multiSendPOLABI, multiSendPOLContractAddress);
+          await updateTokenOptions();
+          await updateTokenInput();
+        } catch (error) {
+          showStatus(`Error connecting wallet: ${error.message}`, 'text-red-600');
+        }
+      } else {
+        showStatus('Please install Trust Wallet or MetaMask!', 'text-red-600');
+      }
+    }
+
+    async function switchNetwork() {
+      const chainId = document.getElementById('networkSelect').value;
+      const network = networkConfigs[chainId];
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: web3.utils.toHex(chainId) }]
+        });
+        showStatus(`Switched to ${network.name}`, 'text-green-600');
+        await updateTokenOptions();
+        await updateTokenInput();
+      } catch (error) {
+        if (error.code === 4902) {
+          try {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: web3.utils.toHex(chainId),
+                chainName: network.name,
+                rpcUrls: [network.rpc],
+                nativeCurrency: { name: network.native, symbol: network.native, decimals: 18 },
+                blockExplorerUrls: [chainId === '137' ? 'https://polygonscan.com' : 'https://bscscan.com']
+              }]
+            });
+            showStatus(`Added and switched to ${network.name}`, 'text-green-600');
+            await updateTokenOptions();
+            await updateTokenInput();
+          } catch (addError) {
+            showStatus(`Error adding network: ${addError.message}`, 'text-red-600');
+          }
+        } else {
+          showStatus(`Error switching network: ${error.message}`, 'text-red-600');
+        }
+      }
+    }
+
+    async function updateTokenOptions() {
+      const chainId = document.getElementById('networkSelect').value;
+      const tokenSelect = document.getElementById('tokenSelect');
+      const options = tokenSelect.options;
+      for (let i = 0; i < options.length; i++) {
+        const option = options[i];
+        const network = option.getAttribute('data-network');
+        if (network && network !== chainId) {
+          option.style.display = 'none';
+        } else {
+          option.style.display = '';
+        }
+      }
+      if (options[tokenSelect.selectedIndex].style.display === 'none') {
+        tokenSelect.value = 'native';
+      }
+      await updateTokenInput();
+    }
+
+    async function updateTokenInput() {
+      const tokenSelect = document.getElementById('tokenSelect');
+      const customTokenDiv = document.getElementById('customTokenDiv');
+      const tokenAddressInput = document.getElementById('tokenAddress');
+      if (tokenSelect.value === 'custom') {
+        customTokenDiv.classList.remove('hidden');
+        tokenAddressInput.value = '';
+      } else {
+        customTokenDiv.classList.add('hidden');
+        tokenAddressInput.value = tokenSelect.value === 'native' ? '' : tokenSelect.value;
+      }
+    }
+
+    async function parseInput(isNative = false) {
+      const csvInput = document.getElementById('csvInput').files[0];
+      const textareaInput = document.getElementById('addresses').value;
+      const amountInput = parseFloat(document.getElementById('amountInput').value);
+      let recipients = [];
+
+      if (isNaN(amountInput) || amountInput <= 0) {
+        showStatus('Please enter a valid amount greater than 0!', 'text-red-600');
+        return { recipients: [], amounts: [] };
+      }
+
+      if (csvInput && textareaInput) {
+        showStatus('Please use either CSV or textarea, not both!', 'text-red-600');
+        return { recipients: [], amounts: [] };
+      }
+
+      let decimals = isNative ? 18 : 6;
+      const tokenAddress = document.getElementById('tokenAddress').value;
+      if (!isNative && tokenAddress) {
+        const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
+        try {
+          decimals = await tokenContract.methods.decimals().call();
+        } catch (error) {
+          showStatus(`Invalid token address: ${error.message}`, 'text-red-600');
+          return { recipients: [], amounts: [] };
+        }
+      }
+
+      try {
+        if (csvInput) {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+              const text = e.target.result;
+              const rows = text.split('\n').map(row => row.trim()).filter(row => row);
+              recipients = rows.slice(1); // Skip header
+              const amount = Math.floor(amountInput * 10**decimals);
+              const amounts = recipients.map(() => amount);
+              resolve({ recipients, amounts });
+            };
+            reader.readAsText(csvInput);
+          });
+        } else if (textareaInput) {
+          recipients = textareaInput.split('\n').map(addr => addr.trim()).filter(addr => addr);
+          const amount = Math.floor(amountInput * 10**decimals);
+          const amounts = recipients.map(() => amount);
+          return { recipients, amounts };
+        }
+      } catch (error) {
+        showStatus(`Error parsing input: ${error.message}`, 'text-red-600');
+        return { recipients: [], amounts: [] };
+      }
+
+      showStatus('No addresses provided!', 'text-red-600');
+      return { recipients: [], amounts: [] };
+    }
+
+    async function checkCooldown() {
+      try {
+        const cooldown = await multiSendContract.methods.getRemainingCooldown(account).call();
+        if (cooldown > 0) {
+          const minutes = Math.ceil(cooldown / 60);
+          const hours = Math.floor(minutes / 60);
+          const displayTime = hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''}` : `${minutes} minute${minutes > 1 ? 's' : ''}`;
+          showStatus(`Please wait ${displayTime} before sending again.`, 'text-red-600');
+          return false;
+        }
+        return true;
+      } catch (error) {
+        showStatus(`Error checking cooldown: ${error.message}`, 'text-red-600');
+        return false;
+      }
+    }
+
+    function showStatus(message, colorClass) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.innerHTML = `<div class="${colorClass} fade-in">${message}</div>`;
+    }
+
+    async function sendTokens() {
+      const tokenSelect = document.getElementById('tokenSelect').value;
+      const tokenAddress = document.getElementById('tokenAddress').value;
+      const chainId = document.getElementById('networkSelect').value;
+      const isNative = tokenSelect === 'native';
+      let { recipients, amounts } = await parseInput(isNative);
+
+      if (recipients.length === 0 || amounts.length === 0) {
+        showStatus('Please provide addresses and amount!', 'text-red-600');
+        return;
+      }
+
+      if (!recipients.every(addr => web3.utils.isAddress(addr) && addr !== '0x0000000000000000000000000000000000000000')) {
+        showStatus('One or more addresses are invalid!', 'text-red-600');
+        return;
+      }
+
+      if (recipients.length > 250) {
+        showStatus('Too many recipients (max 250)!', 'text-red-600');
+        return;
+      }
+
+      const totalAmount = amounts.reduce((sum, a) => sum + a, 0);
+      if (isNative) {
+        const balance = await web3.eth.getBalance(account);
+        if (totalAmount > balance) {
+          const nativeSymbol = networkConfigs[chainId].native;
+          showStatus(`Total amount (${(totalAmount / 10**18).toFixed(4)} ${nativeSymbol}) exceeds balance (${(balance / 10**18).toFixed(4)} ${nativeSymbol})!`, 'text-red-600');
+          return;
+        }
+      } else {
+        if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
+          showStatus('Please select or enter a valid token address!', 'text-red-600');
+          return;
+        }
+        const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
+        const balance = await tokenContract.methods.balanceOf(account).call();
+        const decimals = await tokenContract.methods.decimals().call();
+        if (totalAmount > balance) {
+          showStatus(`Total amount (${(totalAmount / 10**decimals).toFixed(4)} Token) exceeds balance (${(balance / 10**decimals).toFixed(4)} Token)!`, 'text-red-600');
+          return;
+        }
+        if (!(await checkCooldown())) return;
+      }
+
+      const sendButton = document.getElementById('sendTokens');
+      sendButton.innerHTML = '<div class="spinner inline-block"></div> Sending...';
+      sendButton.disabled = true;
+
+      try {
+        const gasParams = await estimateGasPrice();
+        if (isNative) {
+          showStatus(`Sending ${networkConfigs[chainId].native}...`, 'text-yellow-600');
+          const tx = await multiSendPOLContract.methods.multiSend(recipients, amounts).send({
+            from: account,
+            value: totalAmount,
+            gas: 150000 + recipients.length * 50000,
+            maxPriorityFeePerGas: gasParams.maxPriorityFeePerGas,
+            maxFeePerGas: gasParams.maxFeePerGas
+          });
+          const explorer = chainId === '137' ? 'polygonscan.com' : 'bscscan.com';
+          showStatus(`Success! Transaction hash: <a href="https://${explorer}/tx/${tx.transactionHash}" target="_blank" class="underline">${tx.transactionHash.slice(0, 10)}...</a>`, 'text-green-600');
+        } else {
+          const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
+          showStatus('Approving token...', 'text-yellow-600');
+          await tokenContract.methods.approve(multiSendContractAddress, totalAmount).send({
+            from: account,
+            gas: 80000,
+            maxPriorityFeePerGas: gasParams.maxPriorityFeePerGas,
+            maxFeePerGas: gasParams.maxFeePerGas
+          });
+          showStatus('Sending token...', 'text-yellow-600');
+          const tx = await multiSendContract.methods.multiSend(tokenAddress, recipients, amounts).send({
+            from: account,
+            gas: 150000 + recipients.length * 50000,
+            maxPriorityFeePerGas: gasParams.maxPriorityFeePerGas,
+            maxFeePerGas: gasParams.maxFeePerGas
+          });
+          const explorer = chainId === '137' ? 'polygonscan.com' : 'bscscan.com';
+          showStatus(`Success! Transaction hash: <a href="https://${explorer}/tx/${tx.transactionHash}" target="_blank" class="underline">${tx.transactionHash.slice(0, 10)}...</a>`, 'text-green-600');
+        }
+      } catch (error) {
+        let errorMessage = error.message;
+        if (error.message.includes('Cooldown period active')) {
+          errorMessage = 'Transaction failed: Please wait for the 1-hour cooldown period.';
+        } else if (error.message.includes('insufficient allowance')) {
+          errorMessage = 'Transaction failed: Insufficient token allowance. Try approving again.';
+        } else if (error.message.includes('underpriced')) {
+          errorMessage = 'Transaction failed: Gas price too low. Try increasing gas or wait for lower network congestion.';
+        } else if (error.message.includes('gas')) {
+          errorMessage = 'Transaction failed: Gas limit too low or network issue. Try again.';
+        }
+        showStatus(`Error: ${errorMessage}`, 'text-red-600');
+        console.error('Transaction error:', error);
+      } finally {
+        sendButton.innerHTML = 'Send Tokens';
+        sendButton.disabled = false;
+      }
+    }
+
+    document.getElementById('connectWallet').addEventListener('click', initWeb3);
+    document.getElementById('networkSelect').addEventListener('change', switchNetwork);
+    document.getElementById('tokenSelect').addEventListener('change', updateTokenInput);
+    document.getElementById('sendTokens').addEventListener('click', sendTokens);
+  </script>
+</body>
+</html>
