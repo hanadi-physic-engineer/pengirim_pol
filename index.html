@@ -253,8 +253,8 @@
         console.error('Gas estimation error:', error.message);
         showStatus('Gas estimation failed, using default values.', 'text-red-600');
         return {
-          maxPriorityFeePerGas: web3.utils.toWei('50', 'gwei'),
-          maxFeePerGas: web3.utils.toWei('150', 'gwei')
+          maxPriorityFeePerGas: web3.utils.toWei('150', 'gwei'),
+          maxFeePerGas: web3.utils.toWei('200', 'gwei')
         };
       }
     }
