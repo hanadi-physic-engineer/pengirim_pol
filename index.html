@@ -243,11 +243,11 @@
       try {
         const feeData = await web3.eth.getFeeData();
         const baseFee = feeData.lastBaseFeePerGas || web3.utils.toWei('50', 'gwei');
-        const maxPriorityFee = web3.utils.toWei('50', 'gwei');
+        const maxPriorityFee = web3.utils.toWei('150', 'gwei');
         const maxFeePerGas = parseInt(baseFee) + parseInt(maxPriorityFee);
         return {
           maxPriorityFeePerGas: maxPriorityFee,
-          maxFeePerGas: maxFeePerGas > web3.utils.toWei('150', 'gwei') ? maxFeePerGas : web3.utils.toWei('150', 'gwei')
+          maxFeePerGas: maxFeePerGas > web3.utils.toWei('200', 'gwei') ? maxFeePerGas : web3.utils.toWei('200', 'gwei')
         };
       } catch (error) {
         console.error('Gas estimation error:', error.message);
