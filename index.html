@@ -95,68 +95,149 @@
     };
 
     const multiSendABI = [
-      {
-        "anonymous": false,
-        "inputs": [
-          { "indexed": true, "internalType": "address", "name": "sender", "type": "address" },
-          { "indexed": false, "internalType": "uint256", "name": "time", "type": "uint256" }
-        ],
-        "name": "CooldownViolation",
-        "type": "event"
-      },
-      {
-        "inputs": [
-          { "internalType": "address", "name": "token", "type": "address" },
-          { "internalType": "address[]", "name": "recipients", "type": "address[]" },
-          { "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
-        ],
-        "name": "multiSend",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
-          { "indexed": true, "internalType": "address", "name": "recipient", "type": "address" },
-          { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
-        ],
-        "name": "TokenTransferFailed",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          { "indexed": true, "internalType": "address", "name": "token", "type": "address" },
-          { "indexed": true, "internalType": "address", "name": "sender", "type": "address" },
-          { "indexed": false, "internalType": "address[]", "name": "recipients", "type": "address[]" },
-          { "indexed": false, "internalType": "uint256[]", "name": "amounts", "type": "uint256[]" }
-        ],
-        "name": "TokensSent",
-        "type": "event"
-      },
-      {
-        "inputs": [{ "internalType": "address", "name": "sender", "type": "address" }],
-        "name": "getRemainingCooldown",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "MAX_RECIPIENTS",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "TRANSACTION_COOLDOWN",
-        "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-        "stateMutability": "view",
-        "type": "function"
-      }
+    	{
+    		"anonymous": false,
+    		"inputs": [
+    			{
+    				"indexed": true,
+    				"internalType": "address",
+    				"name": "sender",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": false,
+    				"internalType": "uint256",
+    				"name": "time",
+    				"type": "uint256"
+    			}
+    		],
+    		"name": "CooldownViolation",
+    		"type": "event"
+    	},
+    	{
+    		"inputs": [
+    			{
+    				"internalType": "address",
+    				"name": "token",
+    				"type": "address"
+    			},
+    			{
+    				"internalType": "address[]",
+    				"name": "recipients",
+    				"type": "address[]"
+    			},
+    			{
+    				"internalType": "uint256[]",
+    				"name": "amounts",
+    				"type": "uint256[]"
+    			}
+    		],
+    		"name": "multiSend",
+    		"outputs": [],
+    		"stateMutability": "nonpayable",
+    		"type": "function"
+    	},
+    	{
+    		"anonymous": false,
+    		"inputs": [
+    			{
+    				"indexed": true,
+    				"internalType": "address",
+    				"name": "token",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": true,
+    				"internalType": "address",
+    				"name": "recipient",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": false,
+    				"internalType": "uint256",
+    				"name": "amount",
+    				"type": "uint256"
+    			}
+    		],
+    		"name": "TokenTransferFailed",
+    		"type": "event"
+    	},
+    	{
+    		"anonymous": false,
+    		"inputs": [
+    			{
+    				"indexed": true,
+    				"internalType": "address",
+    				"name": "token",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": true,
+    				"internalType": "address",
+    				"name": "sender",
+    				"type": "address"
+    			},
+    			{
+    				"indexed": false,
+    				"internalType": "address[]",
+    				"name": "recipients",
+    				"type": "address[]"
+    			},
+    			{
+    				"indexed": false,
+    				"internalType": "uint256[]",
+    				"name": "amounts",
+    				"type": "uint256[]"
+    			}
+    		],
+    		"name": "TokensSent",
+    		"type": "event"
+    	},
+    	{
+    		"inputs": [
+    			{
+    				"internalType": "address",
+    				"name": "sender",
+    				"type": "address"
+    			}
+    		],
+    		"name": "getRemainingCooldown",
+    		"outputs": [
+    			{
+    				"internalType": "uint256",
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"inputs": [],
+    		"name": "MAX_RECIPIENTS",
+    		"outputs": [
+    			{
+    				"internalType": "uint256",
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"stateMutability": "view",
+    		"type": "function"
+    	},
+    	{
+    		"inputs": [],
+    		"name": "TRANSACTION_COOLDOWN",
+    		"outputs": [
+    			{
+    				"internalType": "uint256",
+    				"name": "",
+    				"type": "uint256"
+    			}
+    		],
+    		"stateMutability": "view",
+    		"type": "function"
+    	}
     ];
 
     const multiSendPOLABI = [
@@ -221,7 +302,7 @@
     let web3, account, multiSendContract, multiSendPOLContract;
 
     // Update alamat kontrak setelah deploy di Remix
-    const multiSendContractAddress = "0xcB4E93Fe6C2568729247603494eE2b3593301403"; // GANTI DENGAN ALAMAT MultiSend.sol
+    const multiSendContractAddress = "0xd04dD733c845366c29Bb7aF62786aE5A980B7a2f"; // GANTI DENGAN ALAMAT MultiSend.sol
     const multiSendPOLContractAddress = "0x0B22044010b34928A55B93c4B9bC343c055C046B"; // GANTI DENGAN ALAMAT MultiSendPOL.sol
 
     async function waitForEthereum(maxAttempts = 20, interval = 1000) {
