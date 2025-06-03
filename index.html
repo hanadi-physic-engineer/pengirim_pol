@@ -11,7 +11,9 @@
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .fade-in { animation: fadeIn 0.5s ease-out; }
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
     .spinner {
       border: 4px solid rgba(255, 255, 255, 0.3);
       border-top: 4px solid #ffffff;
@@ -74,12 +76,9 @@
         <textarea id="addresses" rows="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 hover:shadow-md" placeholder="0x123...456\n0x789...abc"></textarea>
       </div>
 
-      <!-- Warning -->
-      <div class="text-yellow-600 text-sm mt-2">Warning: Only approve exact amount needed!</div>
-
       <!-- Buttons -->
       <div class="flex space-x-4">
-        <button id="connectWallet" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105">Connect MetaMask</button>
+        <button id="connectWallet" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105">Connect Wallet</button>
         <button id="sendTokens" disabled class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed">Send Tokens</button>
       </div>
 
@@ -95,149 +94,149 @@
     };
 
     const multiSendABI = [
-    	{
-    		"anonymous": false,
-    		"inputs": [
-    			{
-    				"indexed": true,
-    				"internalType": "address",
-    				"name": "sender",
-    				"type": "address"
-    			},
-    			{
-    				"indexed": false,
-    				"internalType": "uint256",
-    				"name": "time",
-    				"type": "uint256"
-    			}
-    		],
-    		"name": "CooldownViolation",
-    		"type": "event"
-    	},
-    	{
-    		"inputs": [
-    			{
-    				"internalType": "address",
-    				"name": "token",
-    				"type": "address"
-    			},
-    			{
-    				"internalType": "address[]",
-    				"name": "recipients",
-    				"type": "address[]"
-    			},
-    			{
-    				"internalType": "uint256[]",
-    				"name": "amounts",
-    				"type": "uint256[]"
-    			}
-    		],
-    		"name": "multiSend",
-    		"outputs": [],
-    		"stateMutability": "nonpayable",
-    		"type": "function"
-    	},
-    	{
-    		"anonymous": false,
-    		"inputs": [
-    			{
-    				"indexed": true,
-    				"internalType": "address",
-    				"name": "token",
-    				"type": "address"
-    			},
-    			{
-    				"indexed": true,
-    				"internalType": "address",
-    				"name": "recipient",
-    				"type": "address"
-    			},
-    			{
-    				"indexed": false,
-    				"internalType": "uint256",
-    				"name": "amount",
-    				"type": "uint256"
-    			}
-    		],
-    		"name": "TokenTransferFailed",
-    		"type": "event"
-    	},
-    	{
-    		"anonymous": false,
-    		"inputs": [
-    			{
-    				"indexed": true,
-    				"internalType": "address",
-    				"name": "token",
-    				"type": "address"
-    			},
-    			{
-    				"indexed": true,
-    				"internalType": "address",
-    				"name": "sender",
-    				"type": "address"
-    			},
-    			{
-    				"indexed": false,
-    				"internalType": "address[]",
-    				"name": "recipients",
-    				"type": "address[]"
-    			},
-    			{
-    				"indexed": false,
-    				"internalType": "uint256[]",
-    				"name": "amounts",
-    				"type": "uint256[]"
-    			}
-    		],
-    		"name": "TokensSent",
-    		"type": "event"
-    	},
-    	{
-    		"inputs": [
-    			{
-    				"internalType": "address",
-    				"name": "sender",
-    				"type": "address"
-    			}
-    		],
-    		"name": "getRemainingCooldown",
-    		"outputs": [
-    			{
-    				"internalType": "uint256",
-    				"name": "",
-    				"type": "uint256"
-    			}
-    		],
-    		"stateMutability": "view",
-    		"type": "function"
-    	},
-    	{
-    		"inputs": [],
-    		"name": "MAX_RECIPIENTS",
-    		"outputs": [
-    			{
-    				"internalType": "uint256",
-    				"name": "",
-    				"type": "uint256"
-    			}
-    		],
-    		"stateMutability": "view",
-    		"type": "function"
-    	},
-    	{
-    		"inputs": [],
-    		"name": "TRANSACTION_COOLDOWN",
-    		"outputs": [
-    			{
-    				"internalType": "uint256",
-    				"name": "",
-    				"type": "uint256"
-    			}
-    		],
-    		"stateMutability": "view",
-    		"type": "function"
-    	}
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "time",
+            "type": "uint256"
+          }
+        ],
+        "name": "CooldownViolation",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "internalType": "address[]",
+            "name": "recipients",
+            "type": "address[]"
+          },
+          {
+            "internalType": "uint256[]",
+            "name": "amounts",
+            "type": "uint256[]"
+          }
+        ],
+        "name": "multiSend",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "TokenTransferFailed",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "token",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address[]",
+            "name": "recipients",
+            "type": "address[]"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256[]",
+            "name": "amounts",
+            "type": "uint256[]"
+          }
+        ],
+        "name": "TokensSent",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          }
+        ],
+        "name": "getRemainingCooldown",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "MAX_RECIPIENTS",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "TRANSACTION_COOLDOWN",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
     ];
 
     const multiSendPOLABI = [
@@ -305,112 +304,56 @@
     const multiSendContractAddress = "0xd04dD733c845366c29Bb7aF62786aE5A980B7a2f"; // GANTI DENGAN ALAMAT MultiSend.sol
     const multiSendPOLContractAddress = "0x0B22044010b34928A55B93c4B9bC343c055C046B"; // GANTI DENGAN ALAMAT MultiSendPOL.sol
 
-    async function waitForEthereum(maxAttempts = 20, interval = 1000) {
-      console.log('Waiting for window.ethereum...');
-      for (let i = 0; i < maxAttempts; i++) {
-        if (window.ethereum && window.ethereum.isMetaMask) {
-          console.log('MetaMask detected after', i + 1, 'attempts');
-          return window.ethereum;
-        }
-        console.log('Attempt', i + 1, ': MetaMask not found, retrying...');
-        await new Promise(resolve => setTimeout(resolve, interval));
-      }
-      console.log('MetaMask not found after', maxAttempts, 'attempts');
-      return null;
-    }
-
     async function estimateGasPrice() {
-      console.log('Estimating gas price...');
       try {
         const feeData = await web3.eth.getFeeData();
-        const baseFee = feeData.lastBaseFeePerGas || web3.utils.toWei('50', 'gwei');
-        const maxPriorityFee = web3.utils.toWei('150', 'gwei');
+        const baseFee = feeData.lastBaseFeePerGas || web3.utils.toWei('200', 'gwei');
+        const maxPriorityFee = web3.utils.toWei('30', 'gwei'); // Minimal 25 gwei
         const maxFeePerGas = parseInt(baseFee) + parseInt(maxPriorityFee);
         return {
           maxPriorityFeePerGas: maxPriorityFee,
-          maxFeePerGas: maxFeePerGas > web3.utils.toWei('200', 'gwei') ? maxFeePerGas : web3.utils.toWei('200', 'gwei')
+          maxFeePerGas: maxFeePerGas > web3.utils.toWei('100', 'gwei') ? maxFeePerGas : web3.utils.toWei('100', 'gwei')
         };
       } catch (error) {
-        console.error('Gas estimation error:', error.message);
-        showStatus('Gas estimation failed, using default values.', 'text-red-600');
+        console.error('Gas estimation error:', error);
         return {
-          maxPriorityFeePerGas: web3.utils.toWei('150', 'gwei'),
-          maxFeePerGas: web3.utils.toWei('200', 'gwei')
+          maxPriorityFeePerGas: web3.utils.toWei('30', 'gwei'),
+          maxFeePerGas: web3.utils.toWei('100', 'gwei')
         };
       }
-    }
-
-    async function getTransactionReceiptWithRetry(txHash, maxRetries = 10, interval = 2000) {
-      console.log(`Fetching receipt for tx: ${txHash}`);
-      for (let i = 0; i < maxRetries; i++) {
-        try {
-          const receipt = await web3.eth.getTransactionReceipt(txHash);
-          if (receipt) return receipt;
-          await new Promise(resolve => setTimeout(resolve, interval));
-        } catch (error) {
-          console.error(`Retry ${i + 1}/${maxRetries} failed:`, error.message);
-        }
-      }
-      throw new Error('Failed to get transaction receipt after retries');
     }
 
     async function initWeb3() {
-      console.log('Initializing Web3 for MetaMask...');
-      const ethereum = await waitForEthereum();
-      console.log('Ethereum provider:', ethereum);
-      
-      if (!ethereum) {
-        console.log('No MetaMask provider detected');
-        showStatus('Please install MetaMask extension!', 'text-red-600');
-        alert('Please install MetaMask extension');
-        return;
-      }
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await web3.eth.getAccounts();
+          account = accounts[0];
+          showStatus(`Connected: ${account.slice(0, 6)}...${account.slice(-4)}`, 'text-green-600');
+          document.getElementById('sendTokens').disabled = false;
 
-      if (!ethereum.isMetaMask) {
-        console.log('Non-MetaMask provider detected:', ethereum);
-        showStatus('Detected another wallet (e.g., Trust Wallet). Please disable other wallet extensions and use MetaMask!', 'text-red-600');
-        alert('Please disable other wallet extensions (e.g., Trust Wallet) and use MetaMask');
-        return;
-      }
+          // Validasi alamat kontrak
+          if (!web3.utils.isAddress(multiSendContractAddress) || !web3.utils.isAddress(multiSendPOLContractAddress)) {
+            showStatus('Invalid contract address! Please check MultiSend.sol or MultiSendPOL.sol address.', 'text-red-600');
+            document.getElementById('sendTokens').disabled = true;
+            return;
+          }
 
-      try {
-        // Force MetaMask provider
-        console.log('Forcing MetaMask provider...');
-        await ethereum.request({
-          method: 'wallet_requestPermissions',
-          params: [{ eth_accounts: {} }]
-        });
-        console.log('Requesting accounts...');
-        await ethereum.request({ method: 'eth_requestAccounts' });
-        const accounts = await web3.eth.getAccounts();
-        account = accounts[0];
-        console.log('Connected account:', account);
-        showStatus(`Connected: ${account.slice(0, 6)}...${account.slice(-4)}`, 'text-green-600');
-        document.getElementById('sendTokens').disabled = false;
-
-        if (!web3.utils.isAddress(multiSendContractAddress) || !web3.utils.isAddress(multiSendPOLContractAddress)) {
-          console.log('Invalid contract addresses:', multiSendContractAddress, multiSendPOLContractAddress);
-          showStatus('Invalid contract address! Check MultiSend.sol or MultiSendPOL.sol address.', 'text-red-600');
-          alert('Invalid contract address');
-          document.getElementById('sendTokens').disabled = true;
-          return;
+          multiSendContract = new web3.eth.Contract(multiSendABI, multiSendContractAddress);
+          multiSendPOLContract = new web3.eth.Contract(multiSendPOLABI, multiSendPOLContractAddress);
+          await updateTokenOptions();
+          await updateTokenInput();
+        } catch (error) {
+          showStatus(`Error connecting wallet: ${error.message}`, 'text-red-600');
         }
-
-        multiSendContract = new web3.eth.Contract(multiSendABI, multiSendContractAddress);
-        multiSendPOLContract = new web3.eth.Contract(multiSendPOLABI, multiSendPOLContractAddress);
-        console.log('Contracts initialized');
-        await updateTokenOptions();
-        await updateTokenInput();
-      } catch (error) {
-        console.error('Error connecting MetaMask:', error.message);
-        showStatus(`Error connecting MetaMask: ${error.message}`, 'text-red-600');
-        alert(`Failed to connect MetaMask: ${error.message}`);
+      } else {
+        showStatus('Please install Trust Wallet or MetaMask!', 'text-red-600');
       }
     }
 
     async function switchNetwork() {
       const chainId = document.getElementById('networkSelect').value;
-      console.log(`Switching to chainId: ${chainId}`);
       const network = networkConfigs[chainId];
       try {
         await window.ethereum.request({
@@ -421,7 +364,6 @@
         await updateTokenOptions();
         await updateTokenInput();
       } catch (error) {
-        console.error('Network switch error:', error.message);
         if (error.code === 4902) {
           try {
             await window.ethereum.request({
@@ -430,11 +372,7 @@
                 chainId: web3.utils.toHex(chainId),
                 chainName: network.name,
                 rpcUrls: [network.rpc],
-                nativeCurrency: {
-                  name: network.native,
-                  symbol: network.native,
-                  decimals: 18
-                },
+                nativeCurrency: { name: network.native, symbol: network.native, decimals: 18 },
                 blockExplorerUrls: [chainId === '137' ? 'https://polygonscan.com' : 'https://bscscan.com']
               }]
             });
@@ -442,19 +380,15 @@
             await updateTokenOptions();
             await updateTokenInput();
           } catch (addError) {
-            console.error('Error adding network:', addError.message);
             showStatus(`Error adding network: ${addError.message}`, 'text-red-600');
-            alert(`Failed to add ${network.name}`);
           }
         } else {
           showStatus(`Error switching network: ${error.message}`, 'text-red-600');
-          alert(`Failed to switch: ${error.message}`);
         }
       }
     }
 
     async function updateTokenOptions() {
-      console.log('Updating token options...');
       const chainId = document.getElementById('networkSelect').value;
       const tokenSelect = document.getElementById('tokenSelect');
       const options = tokenSelect.options;
@@ -474,7 +408,6 @@
     }
 
     async function updateTokenInput() {
-      console.log('Updating token input...');
       const tokenSelect = document.getElementById('tokenSelect');
       const customTokenDiv = document.getElementById('customTokenDiv');
       const tokenAddressInput = document.getElementById('tokenAddress');
@@ -488,7 +421,6 @@
     }
 
     async function parseInput(isNative = false) {
-      console.log('Parsing input...');
       const csvInput = document.getElementById('csvInput').files[0];
       const textareaInput = document.getElementById('addresses').value;
       const amountInput = parseFloat(document.getElementById('amountInput').value);
@@ -496,13 +428,11 @@
 
       if (isNaN(amountInput) || amountInput <= 0) {
         showStatus('Please enter a valid amount greater than 0!', 'text-red-600');
-        alert('Invalid amount');
         return { recipients: [], amounts: [] };
       }
 
       if (csvInput && textareaInput) {
         showStatus('Please use either CSV or textarea, not both!', 'text-red-600');
-        alert('Use either CSV or textarea');
         return { recipients: [], amounts: [] };
       }
 
@@ -513,10 +443,8 @@
         try {
           decimals = await tokenContract.methods.decimals().call();
         } catch (error) {
-          console.error('Invalid token address:', error.message);
-          showStatus(`Invalid token address: ${error.message}`);
-          alert('Invalid token: ${tokenAddress}`);
-          return;
+          showStatus(`Invalid token address: ${error.message}`, 'text-red-600');
+          return { recipients: [], amounts: [] };
         }
       }
 
@@ -526,9 +454,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
               const text = e.target.result;
-              rows = text.split('\n').map(row => row.trim()).filter(row => row);
-              recipients = rows.slice(1).map(row => row.replace(/[^0-9a-fA-Fx]/g, ''));
-
+              const rows = text.split('\n').map(row => row.trim()).filter(row => row);
+              recipients = rows.slice(1); // Skip header
               const amount = Math.floor(amountInput * 10**decimals);
               const amounts = recipients.map(() => amount);
               resolve({ recipients, amounts });
@@ -536,26 +463,21 @@
             reader.readAsText(csvInput);
           });
         } else if (textareaInput) {
-          rows = textareaInput.split('\n').map(row => row.trim());
-          recipients = rows.map(row => row.trim()).map(row => row.replace(/[^0-9a-fA-Fx]/g, '' => row.trim())).filter(row => row.trim());
+          recipients = textareaInput.split('\n').map(addr => addr.trim()).filter(addr => addr);
           const amount = Math.floor(amountInput * 10**decimals);
           const amounts = recipients.map(() => amount);
           return { recipients, amounts };
         }
       } catch (error) {
-        console.error('Error parsing input:', error.message);
         showStatus(`Error parsing input: ${error.message}`, 'text-red-600');
-        alert('Input parsing failed');
         return { recipients: [], amounts: [] };
       }
 
       showStatus('No addresses provided!', 'text-red-600');
-      alert('No addresses provided');
       return { recipients: [], amounts: [] };
     }
 
     async function checkCooldown() {
-      console.log('Checking cooldown...');
       try {
         const cooldown = await multiSendContract.methods.getRemainingCooldown(account).call();
         if (cooldown > 0) {
@@ -563,62 +485,53 @@
           const hours = Math.floor(minutes / 60);
           const displayTime = hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''}` : `${minutes} minute${minutes > 1 ? 's' : ''}`;
           showStatus(`Please wait ${displayTime} before sending again.`, 'text-red-600');
-          alert(`Wait ${displayTime} before sending`);
           return false;
         }
         return true;
       } catch (error) {
-        console.error('Cooldown check error:', error.message);
         showStatus(`Error checking cooldown: ${error.message}`, 'text-red-600');
-        alert('Cooldown check failed');
         return false;
       }
     }
 
     function showStatus(message, colorClass) {
-      console.log(`Status: ${message} (${colorClass})`);
       const statusDiv = document.getElementById('status');
       statusDiv.innerHTML = `<div class="${colorClass} fade-in">${message}</div>`;
     }
 
     async function sendTokens() {
-      console.log('Sending tokens...');
       const tokenSelect = document.getElementById('tokenSelect').value;
       const tokenAddress = document.getElementById('tokenAddress').value;
       const chainId = document.getElementById('networkSelect').value;
-      let { recipients, amounts } = await parseInput(tokenSelect === 'native');
+      const isNative = tokenSelect === 'native';
+      let { recipients, amounts } = await parseInput(isNative);
 
       if (recipients.length === 0 || amounts.length === 0) {
         showStatus('Please provide addresses and amount!', 'text-red-600');
-        alert('Provide addresses and amount');
         return;
       }
 
       if (!recipients.every(addr => web3.utils.isAddress(addr) && addr !== '0x0000000000000000000000000000000000000000')) {
         showStatus('One or more addresses are invalid!', 'text-red-600');
-        alert('Invalid addresses');
         return;
       }
 
       if (recipients.length > 250) {
         showStatus('Too many recipients (max 250)!', 'text-red-600');
-        alert('Too many recipients');
         return;
       }
 
       const totalAmount = amounts.reduce((sum, a) => sum + a, 0);
-      if (tokenSelect === 'native') {
+      if (isNative) {
         const balance = await web3.eth.getBalance(account);
         if (totalAmount > balance) {
           const nativeSymbol = networkConfigs[chainId].native;
           showStatus(`Total amount (${(totalAmount / 10**18).toFixed(4)} ${nativeSymbol}) exceeds balance (${(balance / 10**18).toFixed(4)} ${nativeSymbol})!`, 'text-red-600');
-          alert(`Insufficient ${nativeSymbol} balance`);
           return;
         }
       } else {
         if (!tokenAddress || !web3.utils.isAddress(tokenAddress)) {
           showStatus('Please select or enter a valid token address!', 'text-red-600');
-          alert('Invalid token address');
           return;
         }
         const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
@@ -626,7 +539,6 @@
         const decimals = await tokenContract.methods.decimals().call();
         if (totalAmount > balance) {
           showStatus(`Total amount (${(totalAmount / 10**decimals).toFixed(4)} Token) exceeds balance (${(balance / 10**decimals).toFixed(4)} Token)!`, 'text-red-600');
-          alert('Insufficient token balance');
           return;
         }
         if (!(await checkCooldown())) return;
@@ -638,83 +550,59 @@
 
       try {
         const gasParams = await estimateGasPrice();
-        const nonce = await web3.eth.getTransactionCount(account, 'pending');
-        if (tokenSelect === 'native') {
+        if (isNative) {
           showStatus(`Sending ${networkConfigs[chainId].native}...`, 'text-yellow-600');
           const tx = await multiSendPOLContract.methods.multiSend(recipients, amounts).send({
             from: account,
             value: totalAmount,
             gas: 150000 + recipients.length * 50000,
             maxPriorityFeePerGas: gasParams.maxPriorityFeePerGas,
-            maxFeePerGas: gasParams.maxFeePerGas,
-            nonce: nonce
+            maxFeePerGas: gasParams.maxFeePerGas
           });
-          const receipt = await getTransactionReceiptWithRetry(tx.transactionHash);
           const explorer = chainId === '137' ? 'polygonscan.com' : 'bscscan.com';
           showStatus(`Success! Transaction hash: <a href="https://${explorer}/tx/${tx.transactionHash}" target="_blank" class="underline">${tx.transactionHash.slice(0, 10)}...</a>`, 'text-green-600');
         } else {
           const tokenContract = new web3.eth.Contract(tokenABI, tokenAddress);
           showStatus('Approving token...', 'text-yellow-600');
-          const approveTx = await tokenContract.methods.approve(multiSendContractAddress, totalAmount).send({
+          await tokenContract.methods.approve(multiSendContractAddress, totalAmount).send({
             from: account,
             gas: 80000,
             maxPriorityFeePerGas: gasParams.maxPriorityFeePerGas,
-            maxFeePerGas: gasParams.maxFeePerGas,
-            nonce: nonce
+            maxFeePerGas: gasParams.maxFeePerGas
           });
-          await getTransactionReceiptWithRetry(approveTx.transactionHash);
           showStatus('Sending token...', 'text-yellow-600');
-          const sendTx = await multiSendContract.methods.multiSend(tokenAddress, recipients, amounts).send({
+          const tx = await multiSendContract.methods.multiSend(tokenAddress, recipients, amounts).send({
             from: account,
             gas: 150000 + recipients.length * 50000,
             maxPriorityFeePerGas: gasParams.maxPriorityFeePerGas,
-            maxFeePerGas: gasParams.maxFeePerGas,
-            nonce: nonce + 1
+            maxFeePerGas: gasParams.maxFeePerGas
           });
-          await getTransactionReceiptWithRetry(sendTx.transactionHash);
           const explorer = chainId === '137' ? 'polygonscan.com' : 'bscscan.com';
-          showStatus(`Success! Transaction hash: <a href="https://${explorer}/tx/${sendTx.transactionHash}" target="_blank" class="underline">${sendTx.transactionHash.slice(0, 10)}...</a>`, 'text-green-600');
+          showStatus(`Success! Transaction hash: <a href="https://${explorer}/tx/${tx.transactionHash}" target="_blank" class="underline">${tx.transactionHash.slice(0, 10)}...</a>`, 'text-green-600');
         }
       } catch (error) {
-        console.error('Transaction error:', error.message);
         let errorMessage = error.message;
-        if (error.message.includes('Cooldown period active') || error.message.includes('CooldownViolation')) {
-          errorMessage = 'Transaction failed: 1-hour cooldown active. Try again later.';
+        if (error.message.includes('Cooldown period active')) {
+          errorMessage = 'Transaction failed: Please wait for the 1-hour cooldown period.';
         } else if (error.message.includes('insufficient allowance')) {
           errorMessage = 'Transaction failed: Insufficient token allowance. Try approving again.';
         } else if (error.message.includes('underpriced')) {
           errorMessage = 'Transaction failed: Gas price too low. Try increasing gas or wait for lower network congestion.';
-        } else if (error.message.includes('receipt')) {
-          errorMessage = 'Transaction failed: Could not verify transaction receipt. Check network or try again.';
-        } else if (error.message.includes('nonce')) {
-          errorMessage = 'Transaction failed: Nonce mismatch. Check pending transactions.';
-        } else if (error.code === 4001) {
-          errorMessage = 'Transaction rejected by user in MetaMask';
+        } else if (error.message.includes('gas')) {
+          errorMessage = 'Transaction failed: Gas limit too low or network issue. Try again.';
         }
         showStatus(`Error: ${errorMessage}`, 'text-red-600');
-        alert(errorMessage);
+        console.error('Transaction error:', error);
       } finally {
         sendButton.innerHTML = 'Send Tokens';
         sendButton.disabled = false;
       }
     }
 
-    document.getElementById('connectWallet').addEventListener('click', () => {
-      console.log('Connect MetaMask button clicked');
-      initWeb3();
-    });
-    document.getElementById('networkSelect').addEventListener('change', () => {
-      console.log('Network select changed');
-      switchNetwork();
-    });
-    document.getElementById('tokenSelect').addEventListener('change', () => {
-      console.log('Token select changed');
-      updateTokenInput();
-    });
-    document.getElementById('sendTokens').addEventListener('click', () => {
-      console.log('Send Tokens button clicked');
-      sendTokens();
-    });
+    document.getElementById('connectWallet').addEventListener('click', initWeb3);
+    document.getElementById('networkSelect').addEventListener('change', switchNetwork);
+    document.getElementById('tokenSelect').addEventListener('change', updateTokenInput);
+    document.getElementById('sendTokens').addEventListener('click', sendTokens);
   </script>
 </body>
 </html>
